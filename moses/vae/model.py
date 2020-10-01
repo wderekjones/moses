@@ -81,8 +81,10 @@ class VAE(nn.Module):
 
     def string2tensor(self, string, device='model'):
         ids = self.vocabulary.string2ids(string, add_bos=True, add_eos=True)
-        tensor = torch.tensor(ids, dtype=torch.long,
-                              device=self.device if device == 'model' else device)
+        tensor = torch.tensor(
+            ids, dtype=torch.long,
+            device=self.device if device == 'model' else device
+        )
 
         return tensor
 
@@ -229,8 +231,10 @@ class VAE(nn.Module):
             h = self.decoder_lat(z)
             h = h.unsqueeze(0).repeat(self.decoder_rnn.num_layers, 1, 1)
             w = torch.tensor(self.bos, device=self.device).repeat(n_batch)
-            x = torch.tensor([self.pad], device=self.device).repeat(n_batch, max_len)
+            x = torch.tensor([self.pad], device=self.device).repeat(n_batch,
+                                                                    max_len)
             x[:, 0] = self.bos
+
             end_pads = torch.tensor([max_len], device=self.device).repeat(n_batch)
             eos_mask = torch.zeros(n_batch, dtype=torch.bool, device=self.device)
 
@@ -253,7 +257,7 @@ class VAE(nn.Module):
             new_x = []
             for i in range(x.size(0)):
                 new_x.append(x[i, :end_pads[i]])
-                
+
             return [self.tensor2string(i_x) for i_x in new_x]
 
     def load_lbann_weights(self,weights_dir,epoch_count=-1):

@@ -1,17 +1,20 @@
-import argparse
 import os
-import pandas as pd
-import importlib.util
+import argparse
 import sys
+import importlib.util
+import pandas as pd
 
 from moses.models_storage import ModelsStorage
 
 def load_module(name, path):
+    dirname = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(dirname, path)
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
     return module
+
 
 
 MODELS = ModelsStorage()
@@ -21,6 +24,7 @@ split_dataset = load_module("split_dataset", "split_dataset.py")
 eval_script = load_module("eval", "metrics/eval.py")
 trainer_script = load_module("train", "train.py")
 sampler_script = load_module("sample", "sample.py")
+
 
 
 def get_model_path(config, model):
@@ -130,6 +134,7 @@ def train_model(config, model, train_path):
     model_path = get_model_path(config, model)
     config_path = get_config_path(config, model)
     vocab_path = get_vocab_path(config, model)
+    log_path = get_log_path(config, model)
 
     #vocab_path = config.vocab_path    
 
@@ -139,13 +144,22 @@ def train_model(config, model, train_path):
         return
 
     trainer_parser = trainer_script.get_parser()
-    trainer_config = trainer_parser.parse_known_args([model,] + sys.argv[1:] + [
-                                                     '--device', get_device(config),
-                                                     '--train_load', train_path,
-                                                     '--model_save', model_path,
-                                                     '--config_save', config_path,
-                                                     '--vocab_save', vocab_path,
-                                                     '--n_jobs', str(config.n_jobs)])[0]
+    args = [
+        '--device', config.device,
+        '--model_save', model_path,
+        '--config_save', config_path,
+        '--vocab_save', vocab_path,
+        '--log_file', log_path,
+        '--n_jobs', str(config.n_jobs)
+    ]
+    if train_path is not None:
+        args.extend(['--train_load', train_path])
+    if test_path is not None:
+        args.extend(['--val_load', test_path])
+
+    trainer_config = trainer_parser.parse_known_args(
+         [model] + sys.argv[1:] + args
+    )[0]
     trainer_script.main(model, trainer_config)
 
 
@@ -228,9 +242,6 @@ def eval_metrics(
 
 
 def main(config):
-    if not os.path.exists(config.data_dir):
-        os.mkdir(config.data_dir)
-
     if not os.path.exists(config.checkpoint_dir):
         os.mkdir(config.checkpoint_dir)
 

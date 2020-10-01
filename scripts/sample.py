@@ -14,9 +14,11 @@ lg.setLevel(rdkit.RDLogger.CRITICAL)
 
 MODELS = ModelsStorage()
 
+
 def get_parser():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(title='Models sampler script', description='available models')
+    subparsers = parser.add_subparsers(
+        title='Models sampler script', description='available models')
     for model in MODELS.get_model_names():
         add_sample_args(subparsers.add_parser(model))
     return parser
@@ -62,7 +64,9 @@ def main(model, config):
     print("Generating Samples")
     with tqdm(total=config.n_samples, desc='Generating samples') as T:
         while n > 0:
-            current_samples = model.sample(min(n, config.n_batch), config.max_len)
+            current_samples = model.sample(
+                min(n, config.n_batch), config.max_len
+            )
             samples.extend(current_samples)
 
             n -= len(current_samples)
@@ -71,6 +75,7 @@ def main(model, config):
     samples = pd.DataFrame(samples, columns=['SMILES'])
     print("Save generated samples to ", config.gen_save)
     samples.to_csv(config.gen_save, index=False)
+
 
 if __name__ == '__main__':
     parser = get_parser()
