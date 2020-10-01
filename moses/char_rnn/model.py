@@ -50,27 +50,28 @@ class CharRNN(nn.Module):
 
         return string
 
-    def load_lbann_weights(self,weights_dir,epoch_count=None):
-
-       if epoch_count is None:
-         epoch_count = '*'
- 
+    def load_lbann_weights(self, weights_prefix):
+        
         with torch.no_grad():
           #Load Embedding weights
-          emb_weights = np.loadtxt(glob.glob(weights_dir+"*.epoch."+str(epoch_count)+"-emb_matrix-Weights.txt")[0])
+            
+          emb_weights = np.loadtxt(weights_prefix+"-emb_matrix-Weights.txt")
           self.embedding_layer.weight.data.copy_(torch.from_numpy(np.transpose(emb_weights))) 
 
           #Load LSTM weights/biases
           param_idx = ['_ih_matrix','_hh_matrix','_ih_bias', '_hh_bias'] 
           for l in range(self.num_layers):
             for idx, val in enumerate(param_idx):
-              param_tensor = np.loadtxt(glob.glob(weights_dir+"*.epoch."+str(epoch_count)+"*-gru"+str(l+1)+val+"-Weights.txt")[0])
+                
+              param_tensor = np.loadtxt(weights_prefix+"-gru"+str(l+1)+val+"-Weights.txt")
               self.lstm_layer.all_weights[l][idx].copy_(torch.from_numpy(param_tensor))
 
           #Load Linear layer weights/biases
-          linear_layer_weights = np.loadtxt(glob.glob(weights_dir+"*.epoch."+str(epoch_count)+"*-fcmodule"+str(2*self.num_layers+1)+"_matrix-Weights.txt")[0])
+            
+          linear_layer_weights = np.loadtxt(weights_prefix+"-fcmodule"+str(2*self.num_layers+1)+"_matrix-Weights.txt")
           self.linear_layer.weight.data.copy_(torch.from_numpy(linear_layer_weights))
-          linear_layer_bias = np.loadtxt(glob.glob(weights_dir+"*.epoch."+str(epoch_count)+"*-fcmodule"+str(2*self.num_layers+1)+"_bias-Weights.txt")[0])
+
+          linear_layer_bias = np.loadtxt(weights_prefix+"-fcmodule"+str(2*self.num_layers+1)+"_bias-Weights.txt")
           self.linear_layer.bias.data.copy_(torch.from_numpy(linear_layer_bias))
 
           print("DONE loading LBANN weights ")

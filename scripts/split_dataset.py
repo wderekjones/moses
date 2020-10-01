@@ -7,7 +7,7 @@ from moses.metrics import compute_intermediate_statistics
 
 
 def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+    if v.lower() in ("yes", "true", "t", "y", "1"):
         return True
     if v.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
@@ -54,9 +54,9 @@ def main(config):
 
     data = pd.read_csv(dataset_path)
 
-    train_data = data[data['SPLIT'] == 'train']
-    test_data = data[data['SPLIT'] == 'test']
-    test_scaffolds_data = data[data['SPLIT'] == 'test_scaffolds']
+    train_data = data[data["SPLIT"] == "train"]
+    test_data = data[data["SPLIT"] == "test"]
+    test_scaffolds_data = data[data["SPLIT"] == "test_scaffolds"]
 
     if config.train_size is not None:
         train_data = train_data.sample(
@@ -96,9 +96,9 @@ def main(config):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = get_parser()
     config, unknown = parser.parse_known_args()
     if len(unknown) != 0:
-        raise ValueError("Unknown argument "+unknown[0])
+        raise ValueError("Unknown argument " + unknown[0])
     main(config)

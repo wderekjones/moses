@@ -70,16 +70,18 @@ class test_metrics(unittest.TestCase):
         disable_rdkit_log()
         mols = ['CCNC', 'CCC', 'INVALID', 'CCC']
         assert np.allclose(fraction_valid(mols), 3 / 4), "Failed valid"
-        assert np.allclose(fraction_unique(mols, check_validity=False),
-                           3 / 4), "Failed unique"
+        assert np.allclose(
+            fraction_unique(mols, check_validity=False), 3 / 4
+        ), "Failed unique"
         assert np.allclose(fraction_unique(mols, k=2), 1), "Failed unique"
         mols = [Chem.MolFromSmiles(x) for x in mols]
         assert np.allclose(fraction_valid(mols), 3 / 4), "Failed valid"
-        assert np.allclose(fraction_unique(mols, check_validity=False),
-                           3 / 4), "Failed unique"
+        assert np.allclose(
+            fraction_unique(mols, check_validity=False), 3 / 4
+        ), "Failed unique"
         assert np.allclose(fraction_unique(mols, k=2), 1), "Failed unique"
         enable_rdkit_log()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

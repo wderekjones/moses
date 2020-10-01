@@ -86,8 +86,8 @@ def filter_lines(lines, n_jobs, isomeric):
 
 
 def split_dataset(dataset, seed):
-    logger.info('Splitting the dataset')
-    scaffolds = pd.value_counts(dataset['scaffold'])
+    logger.info("Splitting the dataset")
+    scaffolds = pd.value_counts(dataset["scaffold"])
     scaffolds = sorted(scaffolds.items(), key=lambda x: (-x[1], x[0]))
     test_scaffolds = set([x[0] for x in scaffolds[9::10]])
     dataset['SPLIT'] = 'train'
@@ -110,9 +110,9 @@ def main(config):
     dataset.to_csv(config.output, index=None)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = get_parser()
     config, unknown = parser.parse_known_args()
     if len(unknown) != 0:
-        raise ValueError("Unknown argument "+unknown[0])
+        raise ValueError("Unknown argument " + unknown[0])
     main(config)

@@ -36,7 +36,7 @@ def main(model, config):
         torch.save(config, config.config_save)
 
     # For CUDNN to work properly
-    if device.type.startswith('cuda'):
+    if device.type.startswith("cuda"):
         torch.cuda.set_device(device.index or 0)
     if config.train_load is None:
         train_data = get_dataset('train')
@@ -61,11 +61,12 @@ def main(model, config):
     model = MODELS.get_model_class(model)(vocab, config).to(device)
     trainer.fit(model, train_data, val_data)
 
-    model = model.to('cpu')
+    model = model.to("cpu")
     torch.save(model.state_dict(), config.model_save)
 
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parser = get_parser()
     config = parser.parse_args()
     model = sys.argv[1]
